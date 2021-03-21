@@ -17,13 +17,13 @@ The Player Profile section helps a user analyze how the player performs in each 
 
 The Team Builder section allows a user to build a team and analyze their performance in each category, and summarizes performances each fantasy week. The section can help a user to plan which players to draft, and strategies to drafting, such as punting specific categories. 
 
-![](https://github.com/ofer-m/nba_fantasy/blob/main/img/team_builder.mov)
+![](https://github.com/ofer-m/nba_fantasy/blob/main/img/team_builder.gif)
 
 ### Player Stats
 
 The Player Stats section allows the user to query data of per game stats for every NBA player, with filters such as minimum games played, minimum minutes played and position.
 
-![](https://github.com/ofer-m/nba_fantasy/blob/main/img/player_stats.mov)
+![](https://github.com/ofer-m/nba_fantasy/blob/main/img/player_stats.gif)
 
 ## Usage
 Clone or download this repo.
