@@ -39,7 +39,7 @@ summarized_gl <- gl %>%
 
 ui <- navbarPage(
   theme = shinytheme("united"),
-  "NBA Fantasy",
+  paste("NBA Fantasy -", szn),
   # FIRST PANEL: PLAYER PROFILE
   tabPanel(
     "Player Profile",
