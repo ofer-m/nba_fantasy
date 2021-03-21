@@ -10,7 +10,7 @@ The app has 3 sections:
 
 The Player Profile section helps a user analyze how the player performs in each category, and how the player's performance compares to the league. As well, the profile includes the player's performance in each fantasy week, and his game logs. 
 
-![](https://github.com/ofer-m/nba_fantasy/blob/main/img/player_profile.mov)
+![](https://github.com/ofer-m/nba_fantasy/blob/main/img/player_profile.gif)
 
 
 ### Team Builder
