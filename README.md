@@ -42,20 +42,22 @@ Open the `app.R` file in RStudio and click **Run App**.
 
 **To update the data:**
 
-This repository includes data up to March 20, 2021.
+This repository includes data up to March 27, 2021.
 
 Run the following command on the command line from the root directory of this project to update the data for new games:
 
 ```
-python src/update.py
+cd src
+python update.py
 ```
 
 **To scrape data for whole season:**
 
-Run the following command on the command line from the root directory of this project:
+Run the following commands on the command line from the root directory of this project:
 
 ```
-python src/scrape.py
+cd src
+python scrape.py
 ```
 
 *To scrape data form a different NBA season, change the season argument in `SeasonStats` within the `scrape.py` file*.
