@@ -36,6 +36,13 @@ summarized_gl <- gl %>%
     `FT%` = replace_na(`FT%`, 0)
   )
 
+week_per_game <- summarized_gl %>%
+  ungroup() %>%
+  mutate_at(
+    c("FG", "FT", "3P", "PTS", "REB", "AST", "STL", "BLK", "TOV"),
+    ~ replace_na(round(. / Games, 2), 0)
+  ) %>%
+  mutate(Week = as.factor(Week))
 
 ui <- navbarPage(
   theme = shinytheme("united"),
@@ -55,7 +62,11 @@ ui <- navbarPage(
           "STL" = "STL", "BLK" = "BLK",
           "TOV" = "TOV"
         ), selected = "FG%"),
-        sliderInput("min_games_input", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 10, step = 1),
+        dateRangeInput("dateRange",
+          label = "Date Range",
+          start = min(gl$Date), end = max(gl$Date)
+        ),
+        sliderInput("min_games_input", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 0, step = 1),
         sliderInput("min_minutes_input", "Minutes per Game:", min = 0, max = 48, value = c(0, 48), step = 1),
         checkboxGroupInput("pos_compare", "Positions to Compare:",
           choices = c("G" = "G", "F" = "F", "C" = "C"),
@@ -78,7 +89,7 @@ ui <- navbarPage(
             h3("Distribution"),
             plotlyOutput("stat_dist", width = "auto", height = "auto")
           ),
-          tabPanel(h3("Week Summary"), div(dataTableOutput("week_summary"), style = "font-size:115%"), width = "auto"),
+          tabPanel(h3("Week Summary"), plotlyOutput("week_summary"), width = "auto", height = "auto"),
           tabPanel(h3("Game Logs"), div(dataTableOutput("gamelog"), style = "font-size:115%"), width = "auto")
         )
       )
@@ -87,7 +98,7 @@ ui <- navbarPage(
   # SECOND PANEL: TEAM BUILDER
   tabPanel(
     "Team Builder",
-    titlePanel(h1(paste("Fantasy Team Builder", szn), align = "center", style = "color: #fe5a1d;font-size:70px")),
+    titlePanel(h1(paste("Fantasy Team Builder"), align = "center", style = "color: #fe5a1d;font-size:70px")),
     h2("Enter up to 13 players to see how your team would perform, based on 2020-2021 stats", align = "center", style = "font-size:20px"),
     sidebarLayout(
       sidebarPanel(tags$style(".well {background-color:#fe5a1d;}"),
@@ -135,19 +146,45 @@ ui <- navbarPage(
 
 server <- function(input, output) {
   output$league_comp <- renderPlotly(
-    plot_stat_league(agg, input$player_input, input$category_input,
+    plot_stat_league(gl, input$player_input, input$category_input,
       input$pos_compare,
       min_games = input$min_games_input,
-      min_minutes = input$min_minutes_input
+      min_minutes = input$min_minutes_input,
+      date = input$dateRange
     )
   )
   output$stat_dist <- renderPlotly(
-    plot_stats_ind(gl, input$player_input, input$category_input)
+    plot_stats_ind(gl, input$player_input, input$category_input, input$dateRange)
   )
   output$player_table <- renderTable(
-    agg %>%
-      filter(Player == input$player_input) %>%
-      select(-c(Player, General_Position, Position, Season)) %>%
+    gl %>%
+      filter(Player == input$player_input &
+        Date >= input$dateRange[1] &
+        Date <= input$dateRange[2]) %>%
+      group_by(Player) %>%
+      summarise(
+        Games_Played = n() - sum(DNP),
+        Games_Started = sum(Starter),
+        Games_Missed = sum(DNP),
+        Minutes = round(mean(Minutes[DNP == 0]), 2),
+        FG = round(mean(FG[DNP == 0]), 2),
+        FGA = round(mean(FGA[DNP == 0]), 2),
+        `FG%` = round(FG / FGA, 3),
+        `3P` = round(mean(`3P`[DNP == 0]), 2),
+        `3PA` = round(mean(`3PA`[DNP == 0]), 2),
+        `3P%` = round(`3P` / `3PA`, 3),
+        FT = round(mean(FT[DNP == 0]), 2),
+        FTA = round(mean(FTA[DNP == 0]), 2),
+        `FT%` = round(FT / FTA, 3),
+        REB = round(mean(REB[DNP == 0]), 2),
+        AST = round(mean(AST[DNP == 0]), 2),
+        STL = round(mean(STL[DNP == 0]), 2),
+        BLK = round(mean(BLK[DNP == 0]), 2),
+        TOV = round(mean(TOV[DNP == 0]), 2),
+        PTS = round(mean(PTS[DNP == 0]), 2),
+      ) %>%
+      mutate_at(vars(-c(Player)), replace_na, 0) %>%
+      select(-c(Player)) %>%
       rename(Games = Games_Played, `Games Started` = Games_Started, `Games Missed` = Games_Missed) %>%
       mutate(
         Games = as.integer(Games),
@@ -158,7 +195,9 @@ server <- function(input, output) {
 
   output$gamelog <- renderDataTable(
     gl %>%
-      filter(Player == input$player_input) %>%
+      filter(Player == input$player_input &
+        Date >= input$dateRange[1] &
+        Date <= input$dateRange[2]) %>%
       select(-c(Player, Team, Position, General_Position, Season)) %>%
       mutate(
         Minutes = round(Minutes, 2),
@@ -187,14 +226,8 @@ server <- function(input, output) {
       pull())
   )
 
-  output$week_summary <- renderDataTable(
-    summarized_gl %>%
-      ungroup() %>%
-      filter(Player == input$player_input) %>%
-      select(-c(Player, General_Position)) %>%
-      mutate_at(vars(c(`FG%`, `FT%`)), round, 3),
-    rownames = FALSE,
-    options = list(pageLength = 25, columnDefs = list(list(orderSequence = c("desc", "asc"), targets = "_all")))
+  output$week_summary <- renderPlotly(
+    week_plot(week_per_game, input$player_input, input$category_input)
   )
 
   output$league_stats <- renderDataTable(
