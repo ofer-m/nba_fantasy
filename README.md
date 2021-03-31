@@ -4,13 +4,19 @@
 
 A web application that helps NBA fantasy players analyze NBA players to build and manage their team throughout the season. The app uses data scraped from [Basketball Reference](https://www.basketball-reference.com/), for the 2020-2021 NBA Regular Season. 
 
-The app has 3 sections:
+The app has 4 sections:
 
 ### Player Profile
 
 The Player Profile section helps a user analyze how the player performs in each category, and how the player's performance compares to the league. As well, the profile includes the player's performance in each fantasy week, and his game logs. 
 
 ![](https://github.com/ofer-m/nba_fantasy/blob/main/img/player_profile.gif)
+
+### Compare Players
+
+The Compare Players section helps a user choose between two players, by displaying summary statistics, performance in each category and performance in each fantasy week.
+
+![](https://github.com/ofer-m/nba_fantasy/blob/main/img/compare_players.gif)
 
 
 ### Team Builder
@@ -42,7 +48,7 @@ Open the `app.R` file in RStudio and click **Run App**.
 
 **To update the data:**
 
-This repository includes data up to March 27, 2021.
+This repository includes data up to *March 30, 2021*.
 
 Run the following command on the command line from the root directory of this project to update the data for new games:
 
