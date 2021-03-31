@@ -74,6 +74,7 @@ ui <- navbarPage(
         ),
         width = 2
       ),
+
       mainPanel(
         titlePanel(h1(textOutput("selected_player"), align = "center", style = "color: #fe5a1d;font-size:70px")),
         h4(textOutput("selected_player_pos"), align = "center", style = "font-size:30px"),
@@ -93,7 +94,77 @@ ui <- navbarPage(
           tabPanel(h3("Game Logs"), div(dataTableOutput("gamelog"), style = "font-size:115%"), width = "auto")
         )
       )
-    )
+    ), h3(paste("Last Updated: ", max(gl$Date))),
+  ),
+
+  tabPanel(
+    "Compare Players",
+    sidebarLayout(
+      sidebarPanel(
+        tags$style(".well {background-color:#fe5a1d;}"),
+        selectInput(inputId = "player_1", label = "Player 1:", choices = agg$Player, selected = "LeBron James"),
+        selectInput(inputId = "player_2", label = "Player 2:", choices = agg$Player, selected = "Kevin Durant"),
+        selectInput("category_input_comp", "Category:", choices = list(
+          "FG%" = "FG%", "FT%" = "FT%",
+          "3P" = "3P", "PTS" = "PTS",
+          "REB" = "REB", "AST" = "AST",
+          "STL" = "STL", "BLK" = "BLK",
+          "TOV" = "TOV"
+        ), selected = "FG%"),
+        dateRangeInput("dateRange_compare",
+          label = "Date Range",
+          start = min(gl$Date), end = max(gl$Date)
+        ),
+        sliderInput("min_games_input_comp", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 0, step = 1),
+        sliderInput("min_minutes_input_comp", "Minutes per Game:", min = 0, max = 48, value = c(0, 48), step = 1),
+        checkboxGroupInput("pos_compare_comp", "Positions to Compare:",
+          choices = c("G" = "G", "F" = "F", "C" = "C"),
+          selected = c("G", "F", "C")
+        ),
+        width = 2
+      ),
+
+
+      mainPanel(
+        tags$head(
+          tags$style(HTML("
+    #comp_player1_text {
+      color: black;
+    }
+    #comp_player2_text {
+      color: grey;
+    }
+   
+    } 
+  "))
+        ),
+
+        tags$div(h1(textOutput("comp_player1_text", inline = TRUE), style = "display:inline-block;color:black;font-size:70px;"),
+          h1("vs.", style = "display:inline-block;color:#fe5a1d;font-size:50px;margin: 40px;"),
+          h1(textOutput("comp_player2_text", inline = TRUE), style = "display:inline-block;color:grey;font-size:70px"),
+          align = "center"
+        ),
+        tabsetPanel(
+          type = "tabs",
+          tabPanel(h3("Quick Comparison"),
+            div(dataTableOutput("comp_table"), style = "font-size:175%"),
+            width = "auto"
+          ),
+          tabPanel(
+            h3("League Comparison"),
+            plotlyOutput("comp_league_plot", width = "auto", height = "auto")
+          ),
+          tabPanel(
+            h3("Distribution"),
+            plotlyOutput("dist_compare", width = "auto", height = "auto")
+          ),
+          tabPanel(
+            h3("Week Summary"),
+            plotlyOutput("week_compare", width = "auto", height = "auto")
+          )
+        )
+      )
+    ), h3(paste("Last Updated: ", max(gl$Date)))
   ),
   # SECOND PANEL: TEAM BUILDER
   tabPanel(
@@ -122,7 +193,7 @@ ui <- navbarPage(
           div(dataTableOutput("week_bkdwn", width = "auto"), style = "font-size:115%")
         )
       ))
-    )
+    ), h3(paste("Last Updated: ", max(gl$Date)))
   ),
   # THIRD PANEL: PLAYER STATS
   tabPanel(
@@ -140,7 +211,7 @@ ui <- navbarPage(
       )),
     ), mainPanel(
       fluidRow(div(dataTableOutput("league_stats", width = "auto"), style = "font-size:105%"))
-    )
+    ), h3(paste("Last Updated: ", max(gl$Date)))
   )
 )
 
@@ -228,6 +299,66 @@ server <- function(input, output) {
 
   output$week_summary <- renderPlotly(
     week_plot(week_per_game, input$player_input, input$category_input)
+  )
+
+
+  output$comp_player1_text <- renderText(
+    input$player_1
+  )
+
+  output$comp_player2_text <- renderText(
+    input$player_2
+  )
+
+  output$comp_table <- renderDataTable(DT::datatable(
+    compare_players_table(gl, input$player_1, input$player_2, input$dateRange_compare),
+    rownames = F,
+    options = list(
+      pageLength = 25, ordering = F,
+      columnDefs = list(list(className = "dt-center", targets = "_all")),
+      rowCallback = JS(
+        'function(row, data) {
+    var num_data = data.slice(1,data.length)
+    var max_stat = Math.max.apply(Math,num_data);
+    for(i=1;i < data.length; i++) {
+      if(data[i]==max_stat) {
+        $("td:eq("+i+")", row).css("background-color", "lightgreen")
+      } 
+    }
+  }'
+      )
+    )
+  ) %>%
+    formatStyle(columns = c("Stat"), fontWeight = "bold") %>%
+    formatStyle(columns = c(input$compare_player_input[1], input$compare_player_input[2]), `text-align` = "center"))
+
+
+
+  output$comp_league_plot <- renderPlotly(
+    plot_stat_league_compare(gl,
+      c(input$player_1, input$player_2),
+      category = input$category_input_comp,
+      positions = input$pos_compare_comp,
+      min_games = input$min_games_input_comp,
+      min_minutes = input$min_minutes_input_comp,
+      date = input$dateRange_compare
+    )
+  )
+
+  output$dist_compare <- renderPlotly(
+    plot_stats_compare(gl,
+      c(input$player_1, input$player_2),
+      category = input$category_input_comp,
+      date = input$dateRange_compare
+    )
+  )
+
+
+  output$week_compare <- renderPlotly(
+    week_plot_compare(week_per_game,
+      input$player_1, input$player_2,
+      category = input$category_input_comp
+    )
   )
 
   output$league_stats <- renderDataTable(
