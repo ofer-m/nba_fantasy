@@ -217,6 +217,10 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
     Minutes <= min_minutes[2])
   szn <- unique(gl$Season)
 
+  line_colors <- list()
+  line_colors[[selected_player]] <- "black"
+  line_colors[["League Average"]] <- "blue"
+  
   if (category == "3P") {
     player <- agg_player %>%
       select(`3P`) %>%
@@ -245,7 +249,7 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
       coord_cartesian(xlim = c(min_amt, max_amt)) +
       scale_x_continuous(breaks = seq(min_amt, max_amt, tick_size)) +
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_colour_manual("", values = c("blue", "black")) +
+      scale_colour_manual("", values = line_colors) +
       theme_bw(base_size = 12)
 
     ggplotly(plot, tooltip = "text", width = 1300, height = 600)
@@ -272,7 +276,7 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
       coord_cartesian(xlim = c(min_amt, max_amt)) +
       scale_x_continuous(breaks = seq(min_amt, max_amt, 2)) +
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_colour_manual("", values = c("blue", "black")) +
+      scale_colour_manual("", values = line_colors) +
       theme_bw(base_size = 12)
     ggplotly(plot, tooltip = "text", width = 1300, height = 600)
   } else if (category == "REB") {
@@ -303,7 +307,7 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
       coord_cartesian(xlim = c(min_amt, max_amt)) +
       scale_x_continuous(breaks = seq(min_amt, max_amt, tick_size)) +
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_colour_manual("", values = c("blue", "black")) +
+      scale_colour_manual("", values = line_colors) +
       theme_bw(base_size = 12)
     ggplotly(plot, tooltip = "text", width = 1300, height = 600)
   } else if (category == "AST") {
@@ -334,7 +338,7 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
       coord_cartesian(xlim = c(min_amt, max_amt)) +
       scale_x_continuous(breaks = seq(min_amt, max_amt, tick_size)) +
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_colour_manual("", values = c("blue", "black")) +
+      scale_colour_manual("", values = line_colors) +
       theme_bw(base_size = 12)
     ggplotly(plot, tooltip = "text", width = 1300, height = 600)
   } else if (category == "STL") {
@@ -367,7 +371,7 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
       coord_cartesian(xlim = c(min_amt, max_amt)) +
       scale_x_continuous(breaks = seq(min_amt, max_amt, tick_size)) +
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_colour_manual("", values = c("blue", "black")) +
+      scale_colour_manual("", values = line_colors) +
       theme_bw(base_size = 12)
     ggplotly(plot, tooltip = "text", width = 1300, height = 600)
   } else if (category == "BLK") {
@@ -398,7 +402,7 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
       coord_cartesian(xlim = c(min_amt, max_amt)) +
       scale_x_continuous(breaks = seq(min_amt, max_amt, tick_size)) +
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_colour_manual("", values = c("blue", "black")) +
+      scale_colour_manual("", values = line_colors) +
       theme_bw(base_size = 12)
     ggplotly(plot, tooltip = "text", width = 1300, height = 600)
   } else if (category == "TOV") {
@@ -430,7 +434,7 @@ plot_stat_league <- function(gl, selected_player, category, positions, min_games
       coord_cartesian(xlim = c(min_amt, max_amt)) +
       scale_x_continuous(breaks = seq(min_amt, max_amt, tick_size)) +
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_colour_manual("", values = c("blue", "black")) +
+      scale_colour_manual("", values = line_colors) +
       theme_bw(base_size = 12)
     ggplotly(plot, tooltip = "text", width = 1300, height = 600)
   } else if (category == "FT%") {
