@@ -9,12 +9,6 @@
 
 echo Running with set environment variables
 echo --------------------------------------------
-
-TEMP_WORKSPACE_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
-TEMP_WORKSPACE_DIR_2="$(cd "$(dirname "$TEMP_WORKSPACE_DIR")" && pwd)/$(basename "$TEMP_WORKSPACE_DIR")"
-export WORKSPACE_DIR=$(dirname $(dirname $TEMP_WORKSPACE_DIR_2))
-echo WORKSPACE_DIR=$WORKSPACE_DIR
-
 # export ECR_ENDPOINT=$(grep -o '"ecr_endpoint":"[^"]*' $HOME/credentials.json | cut -d'"' -f4)
 # echo ECR_ENDPOINT=$ECR_ENDPOINT
 

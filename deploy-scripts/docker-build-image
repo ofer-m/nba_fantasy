@@ -1,4 +1,4 @@
 #!/bin/bash
 . "$(dirname "${BASH_SOURCE[0]}")/common"
 
-docker build -t $DOCKER_IMAGE_TAG $WORKSPACE_DIR
+docker build -t $DOCKER_IMAGE_TAG ../
