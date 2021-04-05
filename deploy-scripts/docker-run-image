@@ -1,0 +1,6 @@
+#!/bin/bash
+. "$(dirname "${BASH_SOURCE[0]}")/common"
+
+docker run -p 80:3838 -detach $DOCKER_IMAGE_TAG
+
+echo "access webserver -> http://localhost/ or if using windows use your docker-machine ip"
