@@ -1,0 +1,12 @@
+#!/bin/bash
+. "$(dirname "${BASH_SOURCE[0]}")/common"
+
+aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $ECR_ENDPOINT
+
+fullEcrTag=$ECR_ENDPOINT/nba_fantasy
+
+docker tag $DOCKER_IMAGE_TAG $fullEcrTag
+echo Tagged latest docker image
+
+docker push $fullEcrTag
+

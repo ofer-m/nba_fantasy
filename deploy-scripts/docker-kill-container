@@ -1,0 +1,5 @@
+#!/bin/bash
+. "$(dirname "${BASH_SOURCE[0]}")/common"
+
+docker container kill $(docker ps | grep "$DOCKER_IMAGE_TAG" | awk '{print $1}')
+

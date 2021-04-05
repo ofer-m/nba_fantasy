@@ -1,19 +1,22 @@
 #!/bin/bash
 
-# Check for credentials file
-# if [ ! -f $HOME/credentials_nba_fantasy.json ]; then
-  # echo "Could not find credentials_nba_fantasy.json file in your home directory ($HOME)."
-  # echo "This file is required to run connect to third party services such as AWS."
-  # exit 1
-# fi
-
 echo Running with set environment variables
 echo --------------------------------------------
-# export ECR_ENDPOINT=$(grep -o '"ecr_endpoint":"[^"]*' $HOME/credentials.json | cut -d'"' -f4)
-# echo ECR_ENDPOINT=$ECR_ENDPOINT
 
 export DOCKER_IMAGE_TAG=nba_fantasy:latest
 echo DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
+
+# Check for credentials file
+if [ ! -f $HOME/credentials_nba_fantasy.json ]; then
+  echo
+  echo "Could not find credentials_nba_fantasy.json file in your home directory ($HOME)."
+  echo "This file is required to run connect to third party services such as AWS."
+  echo "Certain docker commands will now work"
+  echo "ECR_ENDPOINT=<UNSET BECAUSE MISSING CREDENTIALS FILE>"
+else
+  export ECR_ENDPOINT=$(grep -o '"ecr_endpoint":"[^"]*' $HOME/credentials_nba_fantasy.json | cut -d'"' -f4)
+  echo ECR_ENDPOINT=$ECR_ENDPOINT
+fi
 
 echo
 
