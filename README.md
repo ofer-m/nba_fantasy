@@ -10,26 +10,26 @@ The app has 4 sections:
 
 The Player Profile section helps a user analyze how the player performs in each category, and how the player's performance compares to the league. As well, the profile includes the player's performance in each fantasy week, and his game logs. 
 
-![](https://github.com/ofer-m/nba_fantasy/blob/main/img/player_profile.gif)
+![](https://github.com/ofer-m/nba_fantasy/blob/main/app/img/player_profile.gif)
 
 ### Compare Players
 
 The Compare Players section helps a user choose between two players, by displaying summary statistics, performance in each category and performance in each fantasy week.
 
-![](https://github.com/ofer-m/nba_fantasy/blob/main/img/compare_players.gif)
+![](https://github.com/ofer-m/nba_fantasy/blob/main/app/img/compare_players.gif)
 
 
 ### Team Builder
 
 The Team Builder section allows a user to build a team and analyze their performance in each category, and summarizes performances each fantasy week. The section can help a user to plan which players to draft, and strategies to drafting, such as punting specific categories. 
 
-![](https://github.com/ofer-m/nba_fantasy/blob/main/img/team_builder.gif)
+![](https://github.com/ofer-m/nba_fantasy/blob/main/app/img/team_builder.gif)
 
 ### Player Stats
 
 The Player Stats section allows the user to query data of per game stats for every NBA player, with filters such as minimum games played, minimum minutes played and position.
 
-![](https://github.com/ofer-m/nba_fantasy/blob/main/img/player_stats.gif)
+![](https://github.com/ofer-m/nba_fantasy/blob/main/app/img/player_stats.gif)
 
 ## Usage
 Clone or download this repo.
