@@ -54,7 +54,7 @@ ui <- navbarPage(
       sidebarPanel(tags$style(".well {background-color:#fe5a1d;}"),
 
         selectInput(inputId = "player_input", label = "Player:", choices = agg$Player, selected = "LeBron James"),
-
+        br(),
         selectInput("category_input", "Category:", choices = list(
           "FG%" = "FG%", "FT%" = "FT%",
           "3P" = "3P", "PTS" = "PTS",
@@ -62,11 +62,15 @@ ui <- navbarPage(
           "STL" = "STL", "BLK" = "BLK",
           "TOV" = "TOV"
         ), selected = "FG%"),
+        br(),
+        
         dateRangeInput("dateRange",
           label = "Date Range",
           start = min(gl$Date), end = max(gl$Date)
         ),
+        br(),
         sliderInput("min_games_input", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 0, step = 1),
+        br(),
         sliderInput("min_minutes_input", "Minutes per Game:", min = 0, max = 48, value = c(0, 48), step = 1),
         checkboxGroupInput("pos_compare", "Positions to Compare:",
           choices = c("G" = "G", "F" = "F", "C" = "C"),
@@ -95,6 +99,8 @@ ui <- navbarPage(
         )
       )
     ), h3(paste("Last Updated: ", max(gl$Date))),
+    menuItem("Source code", icon = icon("github"), href = "https://github.com/ofer-m/nba_fantasy")
+    
   ),
 
   tabPanel(
@@ -165,6 +171,7 @@ ui <- navbarPage(
         )
       )
     ), h3(paste("Last Updated: ", max(gl$Date)))
+    
   ),
   # SECOND PANEL: TEAM BUILDER
   tabPanel(
