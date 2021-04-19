@@ -46,6 +46,7 @@ week_per_game <- summarized_gl %>%
 
 ui <- navbarPage(
   theme = shinytheme("united"),
+  footer = includeHTML("footer.html"),
   paste("NBA Fantasy -", szn),
   # FIRST PANEL: PLAYER PROFILE
   tabPanel(
@@ -66,12 +67,14 @@ ui <- navbarPage(
         
         dateRangeInput("dateRange",
           label = "Date Range",
-          start = min(gl$Date), end = max(gl$Date)
+          start = min(gl$Date), end = max(gl$Date),
+          separator = " - "
         ),
         br(),
         sliderInput("min_games_input", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 0, step = 1),
         br(),
         sliderInput("min_minutes_input", "Minutes per Game:", min = 0, max = 48, value = c(0, 48), step = 1),
+        br(),
         checkboxGroupInput("pos_compare", "Positions to Compare:",
           choices = c("G" = "G", "F" = "F", "C" = "C"),
           selected = c("G", "F", "C")
@@ -99,8 +102,7 @@ ui <- navbarPage(
         )
       )
     ), h3(paste("Last Updated: ", max(gl$Date))),
-    menuItem("Source code", icon = icon("github"), href = "https://github.com/ofer-m/nba_fantasy")
-    
+
   ),
 
   tabPanel(
@@ -109,7 +111,9 @@ ui <- navbarPage(
       sidebarPanel(
         tags$style(".well {background-color:#fe5a1d;}"),
         selectInput(inputId = "player_1", label = "Player 1:", choices = agg$Player, selected = "LeBron James"),
+        br(),
         selectInput(inputId = "player_2", label = "Player 2:", choices = agg$Player, selected = "Kevin Durant"),
+        br(),
         selectInput("category_input_comp", "Category:", choices = list(
           "FG%" = "FG%", "FT%" = "FT%",
           "3P" = "3P", "PTS" = "PTS",
@@ -117,12 +121,17 @@ ui <- navbarPage(
           "STL" = "STL", "BLK" = "BLK",
           "TOV" = "TOV"
         ), selected = "FG%"),
+        br(),
         dateRangeInput("dateRange_compare",
           label = "Date Range",
-          start = min(gl$Date), end = max(gl$Date)
+          start = min(gl$Date), end = max(gl$Date),
+          separator = " - "
         ),
+        br(),
         sliderInput("min_games_input_comp", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 0, step = 1),
+        br(),
         sliderInput("min_minutes_input_comp", "Minutes per Game:", min = 0, max = 48, value = c(0, 48), step = 1),
+        br(),
         checkboxGroupInput("pos_compare_comp", "Positions to Compare:",
           choices = c("G" = "G", "F" = "F", "C" = "C"),
           selected = c("G", "F", "C")
@@ -184,6 +193,7 @@ ui <- navbarPage(
           choices = agg$Player, multiple = TRUE,
           options = list(maxItems = 13)
         ),
+        br(),
         selectInput("week_input", "Week:", choices = unique(summarized_gl$Week), multiple = FALSE, selected = 1),
         width = 3
       ), mainPanel(tabsetPanel(
@@ -216,8 +226,8 @@ ui <- navbarPage(
         choices = c("G" = "G", "F" = "F", "C" = "C"),
         selected = c("G", "F", "C")
       )),
-    ), mainPanel(
-      fluidRow(div(dataTableOutput("league_stats", width = "auto"), style = "font-size:105%"))
+    ), fluidRow(mainPanel(
+      fluidRow(div(dataTableOutput("league_stats", width = "auto"), style = "font-size:105%")))
     ), h3(paste("Last Updated: ", max(gl$Date)))
   )
 )
