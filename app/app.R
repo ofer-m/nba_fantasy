@@ -47,7 +47,7 @@ week_per_game <- summarized_gl %>%
 ui <- navbarPage(
   theme = shinytheme("united"),
   footer = includeHTML("footer.html"),
-  paste("NBA Fantasy -", szn),
+  paste("NBA Fantasy -", szn), 
   # FIRST PANEL: PLAYER PROFILE
   tabPanel(
     "Player Profile",
@@ -184,7 +184,7 @@ ui <- navbarPage(
   ),
   # SECOND PANEL: TEAM BUILDER
   tabPanel(
-    "Team Builder",
+    "Team Builder", 
     titlePanel(h1(paste("Fantasy Team Builder"), align = "center", style = "color: #fe5a1d;font-size:70px")),
     h2("Enter up to 13 players to see how your team would perform, based on 2020-2021 stats", align = "center", style = "font-size:20px"),
     sidebarLayout(
@@ -214,7 +214,7 @@ ui <- navbarPage(
   ),
   # THIRD PANEL: PLAYER STATS
   tabPanel(
-    "Player Stats ",
+    "Player Stats", 
     titlePanel(h1(paste("Player Stats", szn, "Regular Season"), align = "left", style = "color: #fe5a1d;font-size:60px")),
     fluidRow(
       column(3, sliderInput("min_games_stats", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 10, step = 1)),
