@@ -9,6 +9,10 @@ source("src/nba_functions.R")
 # read in data
 gl <- read_csv("data/nba_gamelogs.csv")
 agg <- read_csv("data/nba_agg_data.csv")
+agg_player <- read_csv("data/nba_agg_data.csv") %>%
+  select(-c("Season", "Position")) %>%
+  mutate(STOCK = (BLK + STL)) %>%
+  select(c(Player:BLK, STOCK, TOV, PTS))
 szn <- unique(agg$Season)
 
 # group by and summarize data by player, position and week
@@ -47,7 +51,7 @@ week_per_game <- summarized_gl %>%
 ui <- navbarPage(
   theme = shinytheme("united"),
   footer = includeHTML("footer.html"),
-  paste("NBA Fantasy -", szn), 
+  paste("NBA Fantasy -", szn),
   # FIRST PANEL: PLAYER PROFILE
   tabPanel(
     "Player Profile",
@@ -64,7 +68,7 @@ ui <- navbarPage(
           "TOV" = "TOV"
         ), selected = "FG%"),
         br(),
-        
+
         dateRangeInput("dateRange",
           label = "Date Range",
           start = min(gl$Date), end = max(gl$Date),
@@ -102,7 +106,6 @@ ui <- navbarPage(
         )
       )
     ), h3(paste("Last Updated: ", max(gl$Date))),
-
   ),
 
   tabPanel(
@@ -180,11 +183,10 @@ ui <- navbarPage(
         )
       )
     ), h3(paste("Last Updated: ", max(gl$Date)))
-    
   ),
   # SECOND PANEL: TEAM BUILDER
   tabPanel(
-    "Team Builder", 
+    "Team Builder",
     titlePanel(h1(paste("Fantasy Team Builder"), align = "center", style = "color: #fe5a1d;font-size:70px")),
     h2("Enter up to 13 players to see how your team would perform, based on 2020-2021 stats", align = "center", style = "font-size:20px"),
     sidebarLayout(
@@ -214,21 +216,38 @@ ui <- navbarPage(
   ),
   # THIRD PANEL: PLAYER STATS
   tabPanel(
-    "Player Stats", 
+    "Player Stats",
     titlePanel(h1(paste("Player Stats", szn, "Regular Season"), align = "left", style = "color: #fe5a1d;font-size:60px")),
-    fluidRow(
-      column(3, sliderInput("min_games_stats", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 10, step = 1)),
-      column(4,
-        offset = 1,
-        sliderInput("min_minutes_stats", "Minutes per Game:", min = 0, max = 48, value = c(0, 48), step = 1)
+    sidebarLayout(
+      sidebarPanel(
+        # style = "position:fixed;width:inherit;",
+        checkboxGroupInput("position", "Positions to Compare:",
+          choices = c("G" = "G", "F" = "F", "C" = "C"),
+          selected = c("G", "F", "C")
+        ),
+        sliderInput("min_gp", "Minimum Games Played:", min = 0, max = max(agg$Games_Played), value = 0, step = 1),
+        sliderInput("min_gs", "Minimum Games Started:", min = 0, max = max(agg$Games_Started), value = 0, step = 1),
+        sliderInput("max_gm", "Maximum Games Missed:", min = 0, max = max(agg$Games_Missed), value = max(agg$Games_Missed), step = 1),
+        sliderInput("minutes", "Minutes per Game:", min = 0, max = 48, value = c(0, 48), step = 1),
+        sliderInput("fg", "FG per Game:", min = 0, max = max(agg$FG), value = c(0, max(agg$FG)), step = 0.1),
+        sliderInput("fgp", "FG%:", min = 0, max = 1, value = c(0, 1), step = 0.01),
+        sliderInput("three", "3P per Game:", min = 0, max = max(agg[["3P"]]), value = c(0, max(agg[["3P"]])), step = 0.1),
+        sliderInput("three_p", "3P%:", min = 0, max = 1, value = c(0, 1), step = 0.01),
+        sliderInput("ft", "FT per Game:", min = 0, max = max(agg$FT), value = c(0, max(agg$FT)), step = 0.1),
+        sliderInput("ftp", "FT%:", min = 0, max = 1, value = c(0, 1), step = 0.01),
+        sliderInput("reb", "REB per Game:", min = 0, max = max(agg$REB), value = c(0, max(agg$REB)), step = 0.1),
+        sliderInput("ast", "AST per Game:", min = 0, max = max(agg$AST), value = c(0, max(agg$AST)), step = 0.1),
+        sliderInput("stl", "STL per Game:", min = 0, max = max(agg$STL), value = c(0, max(agg$STL)), step = 0.1),
+        sliderInput("blk", "BLK per Game:", min = 0, max = max(agg$BLK), value = c(0, max(agg$BLK)), step = 0.1),
+        sliderInput("stock", "STOCK per Game:", min = 0, max = max(agg_player$STOCK), value = c(0, max(agg_player$STOCK)), step = 0.1),
+        sliderInput("tov", "TOV per Game:", min = 0, max = max(agg$TOV), value = c(0, max(agg$TOV)), step = 0.1),
+        sliderInput("pts", "PTS per Game:", min = 0, max = max(agg$PTS), value = c(0, max(agg$PTS)), step = 0.1),
+        width = 2
       ),
-      column(4, checkboxGroupInput("pos_stats", "Positions to Compare:",
-        choices = c("G" = "G", "F" = "F", "C" = "C"),
-        selected = c("G", "F", "C")
-      )),
-    ), fluidRow(mainPanel(
-      fluidRow(div(dataTableOutput("league_stats", width = "auto"), style = "font-size:105%")))
-    ), h3(paste("Last Updated: ", max(gl$Date)))
+      mainPanel(
+        div(dataTableOutput("player_stats_data_table", width = "auto"), style = "font-size:105%")
+      )
+    )
   )
 )
 
@@ -473,6 +492,38 @@ server <- function(input, output) {
       mutate_at(vars(c(`FG%`, `FT%`)), round, 3),
     rownames = FALSE,
     options = list(pageLength = 13, columnDefs = list(list(orderSequence = c("desc", "asc"), targets = "_all")))
+  )
+
+  output$player_stats_data_table <- renderDataTable(
+    DT::datatable(filter_data(agg_player,
+      position = input$position,
+      gp = input$min_gp,
+      gs = input$min_gs,
+      gm = input$max_gm,
+      minutes = input$minutes,
+      fg = input$fg,
+      fgp = input$fgp,
+      three = input$three,
+      three_p = input$three_p,
+      ft = input$ft,
+      ftp = input$ftp,
+      reb = input$reb,
+      ast = input$ast,
+      stl = input$stl,
+      blk = input$blk,
+      stock = input$stock,
+      tov = input$tov,
+      pts = input$pts
+    ),
+    rownames = FALSE,
+    options = list(
+      pageLength = 20,
+      columnDefs = list(list(
+        orderSequence = c("desc", "asc"),
+        targets = "_all"
+      ))
+    )
+    )
   )
 }
 
