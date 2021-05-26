@@ -1356,3 +1356,62 @@ week_plot_compare <- function(week_stat, player_1, player_2, category) {
 
   ggplotly(plot, tooltip = c("text"), width = 1300, height = 600)
 }
+
+filter_data <- function(agg, 
+                        position,
+                        gp,
+                        gs,
+                        gm,
+                        minutes,
+                        fg,
+                        fgp,
+                        three,
+                        three_p,
+                        ft,
+                        ftp,
+                        reb,
+                        ast,
+                        stl,
+                        blk,
+                        stock,
+                        tov,
+                        pts){
+  agg %>% 
+    arrange(desc(PTS)) %>% 
+    filter(General_Position %in% position &
+             Games_Played >= gp &
+             Games_Started >= gs &
+             Games_Missed <= gm &
+             Minutes >= minutes[1] &
+             Minutes <= minutes[2] &
+             FG >= fg[1] &
+             FG <= fg[2] &
+             `FG%` >= fgp[1] &
+             `FG%` <= fgp[2] &
+             `3P` >= three[1] &
+             `3P` <= three[2] &
+             `3P%` >= three_p[1] &
+             `3P%` <= three_p[2] &
+             FT >= ft[1] &
+             FT <= ft[2] &
+             `FT%` >= ftp[1] &
+             `FT%` <= ftp[2] &
+             REB >= reb[1] &
+             REB <= reb[2] &
+             AST >= ast[1] &
+             AST <= ast[2] &
+             STL >= stl[1] &
+             STL <= stl[2] &
+             BLK >= blk[1] &
+             BLK <= blk[2] &
+             STOCK >= stock[1] &
+             STOCK <= stock[2] &
+             TOV >= tov[1] &
+             TOV <= tov[2] &
+             PTS >= pts[1] &
+             PTS <= pts[2]) %>% 
+    rename(`Position`=`General_Position`,
+           `Games Played`=`Games_Played`,
+           `Games Started`=`Games_Started`,
+           `Games Missed`=`Games_Missed`) 
+}
